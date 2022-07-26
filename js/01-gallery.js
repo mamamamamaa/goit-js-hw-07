@@ -26,29 +26,41 @@ boxRef.addEventListener("click", (e) => {
   }
   const instance = createBox(e);
   instance.show();
-
-  if (basicLightbox.visible()) {
-    escClose(instance);
-  }
 });
 
+function addEscListener(instance) {
+  const closure = conditions(instance);
+  window.addEventListener("keydown", closure);
+}
+
+function removeEscListener(instance) {
+  const closure = conditions(instance);
+  window.removeEventListener("keydown", closure);
+}
+
+function conditions(instance) {
+  return function (e) {
+    if (e.key === "Escape") {
+      instance.close();
+    }
+  };
+}
+
 function createBox(event) {
-  return basicLightbox.create(`
+  return basicLightbox.create(
+    `
   <div class="modal">
     <img
     src="${event.target.dataset.source}"
     alt="${event.target.alt}"
     />
   </div>
-  `);
-}
-
-function escClose(instance) {
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      instance.close();
+  `,
+    {
+      onShow: addEscListener,
+      onClose: removeEscListener,
     }
-  });
+  );
 }
 
 console.log(galleryItems);
